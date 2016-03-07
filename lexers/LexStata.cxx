@@ -1,0 +1,343 @@
+// Scintilla source code edit control
+/** @file LexStata.cxx
+ ** Lexer for Stata
+ **/
+// Copyright 2010 by Alessio Caiazza <alessio.caiazza@ars.toscana.it>
+// The License.txt file describes the conditions under which this software may be distributed.
+
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+#include <stdarg.h>
+#include <assert.h>
+#include <ctype.h>
+
+#include "ILexer.h"
+#include "Scintilla.h"
+#include "SciLexer.h"
+
+#include "WordList.h"
+#include "LexAccessor.h"
+#include "Accessor.h"
+#include "StyleContext.h"
+#include "CharacterSet.h"
+#include "LexerModule.h"
+
+#ifdef SCI_NAMESPACE
+using namespace Scintilla;
+#endif
+
+static inline bool IsAWordChar(const int ch) {
+    return (ch < 0x80) && (isalnum(ch) || ch == '.' || ch == '_');
+}
+
+static inline bool IsAWordStart(const int ch) {
+    return (ch < 0x80) && (isalnum(ch) || ch == '_');
+}
+
+static inline bool IsAnOperator(const int ch) {
+    if (IsASCII(ch) && isalnum(ch))
+        return false;
+    // '.' left out as it is used to make up numbers
+    if (ch == '-' || ch == '+' || ch == '!' || ch == '~' ||
+        ch == '?' || ch == ':' || ch == '*' || ch == '/' ||
+        ch == '^' || ch == '<' || ch == '>' || ch == '=' ||
+        ch == '&' || ch == '|' || ch == '$' || ch == '(' ||
+        ch == ')' || ch == '}' || ch == '{' || ch == '[' ||
+        ch == ']')
+        return true;
+    return false;
+}
+/*
+ * Interface
+ */
+
+//static void ColouriseDocument(
+//    Sci_PositionU startPos,
+//    Sci_Position length,
+//    int initStyle,
+//    WordList *keywordlists[],
+//    Accessor &styler);
+
+
+/*
+ * Implementation
+ *//*
+
+static void ColouriseComment(StyleContext& sc, bool& apostropheStartsAttribute);
+static void ColouriseDelimiter(StyleContext& sc, bool& apostropheStartsAttribute);
+static void ColouriseNumber(StyleContext& sc, bool& apostropheStartsAttribute);
+static void ColouriseWhiteSpace(StyleContext& sc, bool& apostropheStartsAttribute);
+static void ColouriseWord(StyleContext& sc, WordList& keywords, WordList& keywords2, WordList& keywords3, bool& apostropheStartsAttribute);
+
+static inline bool IsDelimiterCharacter(int ch);
+static inline bool IsSeparatorOrDelimiterCharacter(int ch);
+
+static void ColouriseComment(StyleContext& sc, bool&) {
+    sc.SetState(SCE_STATA_COMMENTLINE);
+    while (!sc.atLineEnd) {
+        sc.Forward();
+    }
+}
+
+static void ColouriseDelimiter(StyleContext& sc, bool& apostropheStartsAttribute) {
+    apostropheStartsAttribute = sc.Match (')');
+    sc.SetState(SCE_STATA_DELIMITER);
+    sc.ForwardSetState(SCE_STATA_DEFAULT);
+}*/
+//
+//static void ColouriseNumber(StyleContext& sc, bool& apostropheStartsAttribute) {
+//    apostropheStartsAttribute = true;
+//    std::string number;
+//    sc.SetState(SCE_STATA_NUMBER);
+//    // Get all characters up to a delimiter or a separator, including points, but excluding
+//    // double points (ranges).
+//    while (!IsSeparatorOrDelimiterCharacter(sc.ch) || (sc.ch == '.' && sc.chNext != '.')) {
+//        number += static_cast<char>(sc.ch);
+//        sc.Forward();
+//    }
+//    // Special case: exponent with sign
+//    if ((sc.chPrev == 'e' || sc.chPrev == 'E') &&
+//            (sc.ch == '+' || sc.ch == '-')) {
+//        number += static_cast<char>(sc.ch);
+//        sc.Forward ();
+//        while (!IsSeparatorOrDelimiterCharacter(sc.ch)) {
+//            number += static_cast<char>(sc.ch);
+//            sc.Forward();
+//        }
+//    }
+//    sc.SetState(SCE_STATA_DEFAULT);
+//}
+//
+//static void ColouriseWhiteSpace(StyleContext& sc, bool& ) {
+//    sc.SetState(SCE_STATA_DEFAULT);
+//    sc.ForwardSetState(SCE_STATA_DEFAULT);
+//}
+//
+//static void ColouriseWord(StyleContext& sc, WordList& keywords, WordList& keywords2, WordList& keywords3, bool& apostropheStartsAttribute) {
+//    apostropheStartsAttribute = true;
+//    sc.SetState(SCE_STATA_IDENTIFIER);
+//    std::string word;
+//    while (!sc.atLineEnd && !IsSeparatorOrDelimiterCharacter(sc.ch)) {
+//        word += static_cast<char>(tolower(sc.ch));
+//        sc.Forward();
+//    }
+//    if (keywords.InList(word.c_str())) {
+//        sc.ChangeState(SCE_STATA_KEYWORD);
+//        if (word != "all") {
+//            apostropheStartsAttribute = false;
+//        }
+//    }
+//    else if (keywords2.InList(word.c_str())) {
+//        sc.ChangeState(SCE_STATA_KEYWORD2);
+//        if (word != "all") {
+//            apostropheStartsAttribute = false;
+//        }
+//    }
+//    else if (keywords3.InList(word.c_str())) {
+//        sc.ChangeState(SCE_STATA_KEYWORD3);
+//        if (word != "all") {
+//            apostropheStartsAttribute = false;
+//        }
+//    }
+//    sc.SetState(SCE_STATA_DEFAULT);
+//}
+
+//
+// ColouriseDocument
+//
+//static void ColouriseDocument(
+//    Sci_PositionU startPos,
+//    Sci_Position length,
+//    int initStyle,
+//    WordList *keywordlists[],
+//    Accessor &styler) {
+//    
+//    WordList &keywords = *keywordlists[0];
+//    WordList &types = *keywordlists[1];
+static void ColouriseStataDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordlists[],
+    Accessor &styler) {
+
+    WordList &keywords = *keywordlists[0];
+    WordList &types = *keywordlists[1];
+    WordList &keywords3 = *keywordlists[2];
+    
+    CharacterSet setCouldBePostOp(CharacterSet::setNone, "+-");
+    CharacterSet setWordStart(CharacterSet::setAlpha, "_", 0x80, true);
+    CharacterSet setWord(CharacterSet::setAlphaNum, "._", 0x80, true);
+
+    StyleContext sc(startPos, length, initStyle, styler);
+    for (; sc.More(); sc.Forward()) {
+        // Determine if the current state should terminate.
+        switch (sc.state) {
+            case SCE_STATA_OPERATOR:
+                sc.SetState(SCE_STATA_DEFAULT);
+                break;
+            case SCE_STATA_NUMBER:
+                // We accept almost anything because of hex. and number suffixes
+                if (!setWord.Contains(sc.ch)) {
+                    sc.SetState(SCE_STATA_DEFAULT);
+                }
+                break;
+            case SCE_STATA_IDENTIFIER:
+                if (!setWord.Contains(sc.ch) || (sc.ch == '.')) {
+                    char s[1000];
+                    sc.GetCurrent(s, sizeof(s));
+                    if (keywords.InList(s)) {
+                        sc.ChangeState(SCE_STATA_WORD);
+                    }
+                    else if (types.InList(s)) {
+                        sc.ChangeState(SCE_STATA_TYPE);
+                    }
+                    sc.SetState(SCE_STATA_DEFAULT);
+                }
+                break;
+            case SCE_STATA_COMMENTBLOCK:
+                if (sc.Match('*', '/')) {
+                    sc.Forward();
+                    sc.ForwardSetState(SCE_STATA_DEFAULT);
+                }
+                break;
+			case SCE_STATA_COMMENT:
+            case SCE_STATA_COMMENTLINE:
+                if (sc.atLineStart) {
+                    sc.SetState(SCE_STATA_DEFAULT);
+                }
+                break;
+            case SCE_STATA_STRING:
+                if (sc.ch == '\\') {
+                    if (sc.chNext == '\"' || sc.chNext == '\'' || sc.chNext == '\\') {
+                        sc.Forward();
+                    }
+                }
+                else if (sc.ch == '\"') {
+                    sc.ForwardSetState(SCE_STATA_DEFAULT);
+                }
+                break;
+        }
+        
+        // Determine if a new state should be entered.
+        if (sc.state == SCE_STATA_DEFAULT) {
+            if (IsADigit(sc.ch) || (sc.ch == '.' && IsADigit(sc.chNext))) {
+                sc.SetState(SCE_STATA_NUMBER);
+            }
+            else if (setWordStart.Contains(sc.ch)) {
+                sc.SetState(SCE_STATA_IDENTIFIER);
+            }
+			else if (sc.Match('*')) {
+				sc.SetState(SCE_STATA_COMMENT);
+			}
+            else if (sc.Match('/', '*')) {
+                sc.SetState(SCE_STATA_COMMENTBLOCK);
+                sc.Forward();	// Eat the * so it isn't used for the end of the comment
+            }
+            else if (sc.Match('/', '/')) {
+                sc.SetState(SCE_STATA_COMMENTLINE);
+            }
+            else if (sc.ch == '\"') {
+                sc.SetState(SCE_STATA_STRING);
+            }
+            else if (isoperator(static_cast<char>(sc.ch))) {
+                sc.SetState(SCE_STATA_OPERATOR);
+            }
+        }
+    }
+
+	sc.Complete();
+}
+//
+//static inline bool IsDelimiterCharacter(int ch) {
+//    switch (ch) {
+//    case '&':
+//    case '\'':
+//    case '(':
+//    case ')':
+//    case '*':
+//    case '+':
+//    case ',':
+//    case '-':
+//    case '.':
+//    case '/':
+//    case ':':
+//    case ';':
+//    case '<':
+//    case '=':
+//    case '>':
+//    case '|':
+//        return true;
+//    default:
+//        return false;
+//    }
+//}
+//
+//static inline bool IsSeparatorOrDelimiterCharacter(int ch) {
+//    return IsASpace(ch) || IsDelimiterCharacter(ch);
+//}
+
+// Store both the current line's fold level and the next lines in the
+// level store to make it easy to pick up with each increment
+// and to make it possible to fiddle the current level for "} else {".
+static void FoldStataDoc(Sci_PositionU startPos, Sci_Position length, int, WordList *[],
+    Accessor &styler) {
+    bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
+    bool foldAtElse = styler.GetPropertyInt("fold.at.else", 0) != 0;
+    Sci_PositionU endPos = startPos + length;
+    int visibleChars = 0;
+    Sci_Position lineCurrent = styler.GetLine(startPos);
+    int levelCurrent = SC_FOLDLEVELBASE;
+    if (lineCurrent > 0)
+        levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;
+    int levelMinCurrent = levelCurrent;
+    int levelNext = levelCurrent;
+    char chNext = styler[startPos];
+    int styleNext = styler.StyleAt(startPos);
+    for (Sci_PositionU i = startPos; i < endPos; i++) {
+        char ch = chNext;
+        chNext = styler.SafeGetCharAt(i + 1);
+        int style = styleNext;
+        styleNext = styler.StyleAt(i + 1);
+        bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
+        if (style == SCE_R_OPERATOR) {
+            if (ch == '{') {
+                // Measure the minimum before a '{' to allow
+                // folding on "} else {"
+                if (levelMinCurrent > levelNext) {
+                    levelMinCurrent = levelNext;
+                }
+                levelNext++;
+            }
+            else if (ch == '}') {
+                levelNext--;
+            }
+        }
+        if (atEOL) {
+            int levelUse = levelCurrent;
+            if (foldAtElse) {
+                levelUse = levelMinCurrent;
+            }
+            int lev = levelUse | levelNext << 16;
+            if (visibleChars == 0 && foldCompact)
+                lev |= SC_FOLDLEVELWHITEFLAG;
+            if (levelUse < levelNext)
+                lev |= SC_FOLDLEVELHEADERFLAG;
+            if (lev != styler.LevelAt(lineCurrent)) {
+                styler.SetLevel(lineCurrent, lev);
+            }
+            lineCurrent++;
+            levelCurrent = levelNext;
+            levelMinCurrent = levelCurrent;
+            visibleChars = 0;
+        }
+        if (!isspacechar(ch))
+            visibleChars++;
+    }
+}
+
+
+static const char * const StataWordLists[] = {
+    "Language Keywords",
+    "Types",
+    0,
+};
+
+LexerModule lmStata(SCLEX_STATA, ColouriseStataDoc, "stata", FoldStataDoc, StataWordLists);

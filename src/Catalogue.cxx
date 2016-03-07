@@ -177,6 +177,7 @@ int Scintilla_LinkLexers() {
 	LINK_LEXER(lmSpice);
 	LINK_LEXER(lmSQL);
 	LINK_LEXER(lmSrec);
+	LINK_LEXER(lmStata);
 	LINK_LEXER(lmSTTXT);
 	LINK_LEXER(lmTACL);
 	LINK_LEXER(lmTADS3);
