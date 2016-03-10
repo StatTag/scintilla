@@ -8,7 +8,7 @@ copy C:\Development\scintilla363\scintilla\win32\Release\SciLexer-copy.dll.gz C:
 copy C:\Development\scintilla363\scintilla\win32\Release\SciLexer.dll C:\Development\ScintillaNET\src\ScintillaNET\x86
 copy C:\Development\scintilla363\scintilla\win32\Release\SciLexer.exp C:\Development\ScintillaNET\src\ScintillaNET\x86
 copy C:\Development\scintilla363\scintilla\win32\Release\SciLexer.lib C:\Development\ScintillaNET\src\ScintillaNET\x86
-copy C:\Development\scintilla363\scintilla\win32\Release\SciLexer.pdb C:\Development\ScintillaNET\src\ScintillaNET\x86
+REM copy C:\Development\scintilla363\scintilla\win32\Release\SciLexer.pdb C:\Development\ScintillaNET\src\ScintillaNET\x86
 
 copy C:\Development\scintilla363\scintilla\win32\x64\Release\SciLexer.dll C:\Development\scintilla363\scintilla\win32\x64\Release\SciLexer-copy.dll
 gzip -f C:\Development\scintilla363\scintilla\win32\x64\Release\SciLexer-copy.dll
@@ -16,5 +16,5 @@ copy C:\Development\scintilla363\scintilla\win32\x64\Release\SciLexer-copy.dll.g
 copy C:\Development\scintilla363\scintilla\win32\x64\Release\SciLexer.dll C:\Development\ScintillaNET\src\ScintillaNET\x64
 copy C:\Development\scintilla363\scintilla\win32\x64\Release\SciLexer.exp C:\Development\ScintillaNET\src\ScintillaNET\x64
 copy C:\Development\scintilla363\scintilla\win32\x64\Release\SciLexer.lib C:\Development\ScintillaNET\src\ScintillaNET\x64
-copy C:\Development\scintilla363\scintilla\win32\x64\Release\SciLexer.pdb C:\Development\ScintillaNET\src\ScintillaNET\x64
+REM copy C:\Development\scintilla363\scintilla\win32\x64\Release\SciLexer.pdb C:\Development\ScintillaNET\src\ScintillaNET\x64
 

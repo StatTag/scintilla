@@ -48,119 +48,12 @@ static inline bool IsAnOperator(const int ch) {
         return true;
     return false;
 }
-/*
- * Interface
- */
 
-//static void ColouriseDocument(
-//    Sci_PositionU startPos,
-//    Sci_Position length,
-//    int initStyle,
-//    WordList *keywordlists[],
-//    Accessor &styler);
-
-
-/*
- * Implementation
- *//*
-
-static void ColouriseComment(StyleContext& sc, bool& apostropheStartsAttribute);
-static void ColouriseDelimiter(StyleContext& sc, bool& apostropheStartsAttribute);
-static void ColouriseNumber(StyleContext& sc, bool& apostropheStartsAttribute);
-static void ColouriseWhiteSpace(StyleContext& sc, bool& apostropheStartsAttribute);
-static void ColouriseWord(StyleContext& sc, WordList& keywords, WordList& keywords2, WordList& keywords3, bool& apostropheStartsAttribute);
-
-static inline bool IsDelimiterCharacter(int ch);
-static inline bool IsSeparatorOrDelimiterCharacter(int ch);
-
-static void ColouriseComment(StyleContext& sc, bool&) {
-    sc.SetState(SCE_STATA_COMMENTLINE);
-    while (!sc.atLineEnd) {
-        sc.Forward();
-    }
-}
-
-static void ColouriseDelimiter(StyleContext& sc, bool& apostropheStartsAttribute) {
-    apostropheStartsAttribute = sc.Match (')');
-    sc.SetState(SCE_STATA_DELIMITER);
-    sc.ForwardSetState(SCE_STATA_DEFAULT);
-}*/
-//
-//static void ColouriseNumber(StyleContext& sc, bool& apostropheStartsAttribute) {
-//    apostropheStartsAttribute = true;
-//    std::string number;
-//    sc.SetState(SCE_STATA_NUMBER);
-//    // Get all characters up to a delimiter or a separator, including points, but excluding
-//    // double points (ranges).
-//    while (!IsSeparatorOrDelimiterCharacter(sc.ch) || (sc.ch == '.' && sc.chNext != '.')) {
-//        number += static_cast<char>(sc.ch);
-//        sc.Forward();
-//    }
-//    // Special case: exponent with sign
-//    if ((sc.chPrev == 'e' || sc.chPrev == 'E') &&
-//            (sc.ch == '+' || sc.ch == '-')) {
-//        number += static_cast<char>(sc.ch);
-//        sc.Forward ();
-//        while (!IsSeparatorOrDelimiterCharacter(sc.ch)) {
-//            number += static_cast<char>(sc.ch);
-//            sc.Forward();
-//        }
-//    }
-//    sc.SetState(SCE_STATA_DEFAULT);
-//}
-//
-//static void ColouriseWhiteSpace(StyleContext& sc, bool& ) {
-//    sc.SetState(SCE_STATA_DEFAULT);
-//    sc.ForwardSetState(SCE_STATA_DEFAULT);
-//}
-//
-//static void ColouriseWord(StyleContext& sc, WordList& keywords, WordList& keywords2, WordList& keywords3, bool& apostropheStartsAttribute) {
-//    apostropheStartsAttribute = true;
-//    sc.SetState(SCE_STATA_IDENTIFIER);
-//    std::string word;
-//    while (!sc.atLineEnd && !IsSeparatorOrDelimiterCharacter(sc.ch)) {
-//        word += static_cast<char>(tolower(sc.ch));
-//        sc.Forward();
-//    }
-//    if (keywords.InList(word.c_str())) {
-//        sc.ChangeState(SCE_STATA_KEYWORD);
-//        if (word != "all") {
-//            apostropheStartsAttribute = false;
-//        }
-//    }
-//    else if (keywords2.InList(word.c_str())) {
-//        sc.ChangeState(SCE_STATA_KEYWORD2);
-//        if (word != "all") {
-//            apostropheStartsAttribute = false;
-//        }
-//    }
-//    else if (keywords3.InList(word.c_str())) {
-//        sc.ChangeState(SCE_STATA_KEYWORD3);
-//        if (word != "all") {
-//            apostropheStartsAttribute = false;
-//        }
-//    }
-//    sc.SetState(SCE_STATA_DEFAULT);
-//}
-
-//
-// ColouriseDocument
-//
-//static void ColouriseDocument(
-//    Sci_PositionU startPos,
-//    Sci_Position length,
-//    int initStyle,
-//    WordList *keywordlists[],
-//    Accessor &styler) {
-//    
-//    WordList &keywords = *keywordlists[0];
-//    WordList &types = *keywordlists[1];
 static void ColouriseStataDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordlists[],
     Accessor &styler) {
 
     WordList &keywords = *keywordlists[0];
     WordList &types = *keywordlists[1];
-    WordList &keywords3 = *keywordlists[2];
     
     CharacterSet setCouldBePostOp(CharacterSet::setNone, "+-");
     CharacterSet setWordStart(CharacterSet::setAlpha, "_", 0x80, true);
@@ -245,34 +138,6 @@ static void ColouriseStataDoc(Sci_PositionU startPos, Sci_Position length, int i
 
 	sc.Complete();
 }
-//
-//static inline bool IsDelimiterCharacter(int ch) {
-//    switch (ch) {
-//    case '&':
-//    case '\'':
-//    case '(':
-//    case ')':
-//    case '*':
-//    case '+':
-//    case ',':
-//    case '-':
-//    case '.':
-//    case '/':
-//    case ':':
-//    case ';':
-//    case '<':
-//    case '=':
-//    case '>':
-//    case '|':
-//        return true;
-//    default:
-//        return false;
-//    }
-//}
-//
-//static inline bool IsSeparatorOrDelimiterCharacter(int ch) {
-//    return IsASpace(ch) || IsDelimiterCharacter(ch);
-//}
 
 // Store both the current line's fold level and the next lines in the
 // level store to make it easy to pick up with each increment
