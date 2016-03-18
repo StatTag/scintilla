@@ -60,7 +60,12 @@ static void ColouriseStataDoc(Sci_PositionU startPos, Sci_Position length, int i
     CharacterSet setWord(CharacterSet::setAlphaNum, "._", 0x80, true);
 
     StyleContext sc(startPos, length, initStyle, styler);
+	bool lineHasNonCommentChar = false;
     for (; sc.More(); sc.Forward()) {
+		if (sc.atLineStart) {
+			lineHasNonCommentChar = false;
+		}
+
         // Determine if the current state should terminate.
         switch (sc.state) {
             case SCE_STATA_OPERATOR:
@@ -112,12 +117,14 @@ static void ColouriseStataDoc(Sci_PositionU startPos, Sci_Position length, int i
         // Determine if a new state should be entered.
         if (sc.state == SCE_STATA_DEFAULT) {
             if (IsADigit(sc.ch) || (sc.ch == '.' && IsADigit(sc.chNext))) {
+				lineHasNonCommentChar = true;
                 sc.SetState(SCE_STATA_NUMBER);
             }
             else if (setWordStart.Contains(sc.ch)) {
+				lineHasNonCommentChar = true;
                 sc.SetState(SCE_STATA_IDENTIFIER);
             }
-			else if (sc.Match('*')) {
+			else if (sc.Match('*') && !lineHasNonCommentChar) {
 				sc.SetState(SCE_STATA_COMMENT);
 			}
             else if (sc.Match('/', '*')) {
@@ -128,9 +135,11 @@ static void ColouriseStataDoc(Sci_PositionU startPos, Sci_Position length, int i
                 sc.SetState(SCE_STATA_COMMENTLINE);
             }
             else if (sc.ch == '\"') {
+				lineHasNonCommentChar = true;
                 sc.SetState(SCE_STATA_STRING);
             }
             else if (isoperator(static_cast<char>(sc.ch))) {
+				lineHasNonCommentChar = true;
                 sc.SetState(SCE_STATA_OPERATOR);
             }
         }
