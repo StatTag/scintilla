@@ -169,6 +169,7 @@ int Scintilla_LinkLexers() {
 	LINK_LEXER(lmRegistry);
 	LINK_LEXER(lmRuby);
 	LINK_LEXER(lmRust);
+	LINK_LEXER(lmSAS);
 	LINK_LEXER(lmScriptol);
 	LINK_LEXER(lmSmalltalk);
 	LINK_LEXER(lmSML);
