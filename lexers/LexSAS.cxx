@@ -62,8 +62,6 @@ static void ColouriseSASDoc(Sci_PositionU startPos, Sci_Position length, int ini
     CharacterSet setWordStart(CharacterSet::setAlpha, "_", 0x80, true);
     CharacterSet setWord(CharacterSet::setAlphaNum, "._", 0x80, true);
 
-	FILE* file = fopen("Sas-Debug.txt", "w+");
-
     StyleContext sc(startPos, length, initStyle, styler);
     bool lineHasNonCommentChar = false;
     for (; sc.More(); sc.Forward()) {
@@ -102,7 +100,6 @@ static void ColouriseSASDoc(Sci_PositionU startPos, Sci_Position length, int ini
                 if (!setWord.Contains(sc.ch) || (sc.ch == '.')) {
                     char s[1000];
 					sc.GetCurrentLowered(s, sizeof(s));
-					fprintf(file, "  Testing keywords: %s\r\n", s);
 					if (statements.InList(s)) {
 						sc.ChangeState(SCE_SAS_STATEMENT);
                     }
@@ -149,7 +146,6 @@ static void ColouriseSASDoc(Sci_PositionU startPos, Sci_Position length, int ini
             }
             else if (setWordStart.Contains(sc.ch)) {
                 lineHasNonCommentChar = true;
-				fprintf(file, "Found identifier %c\r\n", sc.ch);
                 sc.SetState(SCE_SAS_IDENTIFIER);
             }
             else if (sc.Match('*') && !lineHasNonCommentChar) {
@@ -176,9 +172,7 @@ static void ColouriseSASDoc(Sci_PositionU startPos, Sci_Position length, int ini
             }
         }
     }
-
-	fclose(file);
-
+	
     sc.Complete();
 }
 
