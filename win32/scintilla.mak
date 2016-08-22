@@ -149,6 +149,7 @@ LEXOBJS=\
 	$(DIR_O)\LexHex.obj \
 	$(DIR_O)\LexHTML.obj \
 	$(DIR_O)\LexInno.obj \
+	$(DIR_O)\LexJSON.obj \
 	$(DIR_O)\LexKix.obj \
 	$(DIR_O)\LexKVIrc.obj \
 	$(DIR_O)\LexLaTeX.obj \
@@ -230,10 +231,10 @@ $(DIR_O)\ScintRes.res : ScintRes.rc
 	$(RC) -fo$@ $**
 
 $(COMPONENT): $(SOBJS) $(DIR_O)\ScintRes.res
-	$(LD) $(LDFLAGS) -DLL -OUT:$@ $** $(LIBS)
+	$(LD) $(LDFLAGS) -DEF:Scintilla.def -DLL -OUT:$@ $** $(LIBS)
 
 $(LEXCOMPONENT): $(LOBJS) $(DIR_O)\ScintRes.res
-	$(LD) $(LDFLAGS) -DLL -OUT:$@ $** $(LIBS)
+	$(LD) $(LDFLAGS) -DEF:Scintilla.def -DLL -OUT:$@ $** $(LIBS)
 
 $(LEXLIB): $(LEXOBJS)
 	LIB /OUT:$@ $(LEXOBJS)
@@ -582,6 +583,8 @@ $(DIR_O)\LexHex.obj: ..\lexers\LexHex.cxx $(LEX_HEADERS)
 $(DIR_O)\LexHTML.obj: ..\lexers\LexHTML.cxx $(LEX_HEADERS)
 
 $(DIR_O)\LexInno.obj: ..\lexers\LexInno.cxx $(LEX_HEADERS)
+
+$(DIR_O)\LexJSON.obj: ..\lexers\LexJSON.cxx $(LEX_HEADERS)
 
 $(DIR_O)\LexKix.obj: ..\lexers\LexKix.cxx $(LEX_HEADERS)
 

@@ -447,17 +447,9 @@ static int GetImeCaretPos(QInputMethodEvent *event)
 	return 0;
 }
 
-static std::vector<int> MapImeIndicators(QInputMethodEvent *event, bool preeditNotChanged)
+static std::vector<int> MapImeIndicators(QInputMethodEvent *event)
 {
-#ifndef Q_OS_LINUX
-	Q_UNUSED(preeditNotChanged)
-#endif
-	const QString preeditStr = event->preeditString();
-	std::vector<int> imeIndicator(preeditStr.length(), SC_INDICATOR_UNKNOWN);
-#ifdef Q_OS_LINUX
-	const int imeCaretPos = GetImeCaretPos(event);
-#endif
-
+	std::vector<int> imeIndicator(event->preeditString().size(), SC_INDICATOR_UNKNOWN);
 	foreach (QInputMethodEvent::Attribute attr, event->attributes()) {
 		if (attr.type == QInputMethodEvent::TextFormat) {
 			QTextFormat format = attr.value.value<QTextFormat>();
@@ -465,12 +457,12 @@ static std::vector<int> MapImeIndicators(QInputMethodEvent *event, bool preeditN
 
 			int indicator = SC_INDICATOR_UNKNOWN;
 			switch (charFormat.underlineStyle()) {
-				case QTextCharFormat::NoUnderline:
-					indicator = SC_INDICATOR_TARGET; //target input
+				case QTextCharFormat::NoUnderline: // win32, linux
+					indicator = SC_INDICATOR_TARGET;
 					break;
-				case QTextCharFormat::SingleUnderline:
-				case QTextCharFormat::DashUnderline:
-					indicator = SC_INDICATOR_INPUT; //normal input
+				case QTextCharFormat::SingleUnderline: // osx
+				case QTextCharFormat::DashUnderline: // win32, linux
+					indicator = SC_INDICATOR_INPUT;
 					break;
 				case QTextCharFormat::DotLine:
 				case QTextCharFormat::DashDotLine:
@@ -482,16 +474,19 @@ static std::vector<int> MapImeIndicators(QInputMethodEvent *event, bool preeditN
 				default:
 					indicator = SC_INDICATOR_UNKNOWN;
 			}
-#ifdef Q_OS_LINUX
-			// ibus-qt has a bug to return only one underline style.
-			// Q_OS_LINUX blocks are temporary work around to cope with it.
-			if ((attr.length > 0) && (attr.start == imeCaretPos)) {
+
+			if (format.hasProperty(QTextFormat::BackgroundBrush)) // win32, linux
 				indicator = SC_INDICATOR_TARGET;
-				if ((imeCaretPos == 0) && (preeditNotChanged)) { // moved by an arrow key.
-					indicator = SC_INDICATOR_INPUT;
+
+#ifdef Q_OS_OSX
+			if (charFormat.underlineStyle() == QTextCharFormat::SingleUnderline) {
+				QColor uc = charFormat.underlineColor();
+				if (uc.lightness() < 2) { // osx
+					indicator = SC_INDICATOR_TARGET;
 				}
 			}
 #endif
+
 			for (int i = attr.start; i < attr.start+attr.length; i++) {
 				imeIndicator[i] = indicator;
 			}
@@ -544,14 +539,7 @@ void ScintillaEditBase::inputMethodEvent(QInputMethodEvent *event)
 
 		sqt->pdoc->TentativeStart(); // TentativeActive() from now on.
 
-		std::vector<int> imeIndicator = MapImeIndicators(event, preeditString == preeditStr);
-#ifdef Q_OS_LINUX
-		preeditString = preeditStr;
-#endif
-
-		// Display preedit characters one by one.
-		int imeCharPos[MAXLENINPUTIME] = {0};
-		int numBytes = 0;
+		std::vector<int> imeIndicator = MapImeIndicators(event);
 
 		const bool recording = sqt->recordingMacro;
 		sqt->recordingMacro = false;
@@ -561,24 +549,27 @@ void ScintillaEditBase::inputMethodEvent(QInputMethodEvent *event)
 			const QByteArray oneChar = sqt->BytesForDocument(oneCharUTF16);
 			const int oneCharLen = oneChar.length();
 
-			// Record character positions for moving ime caret.
-			numBytes += oneCharLen;
-			imeCharPos[i + ucWidth] = numBytes;
-
 			sqt->AddCharUTF(oneChar.data(), oneCharLen);
 
 			DrawImeIndicator(imeIndicator[i], oneCharLen);
-
 			i += ucWidth;
 		}
 		sqt->recordingMacro = recording;
 
 		// Move IME carets.
 		int imeCaretPos = GetImeCaretPos(event);
-		MoveImeCarets(- imeCharPos[preeditStrLen] + imeCharPos[imeCaretPos]);
+		int imeEndToImeCaretU16 = imeCaretPos - preeditStrLen;
+		int imeCaretPosDoc = sqt->pdoc->GetRelativePositionUTF16(sqt->CurrentPosition(), imeEndToImeCaretU16);
+
+		MoveImeCarets(- sqt->CurrentPosition() + imeCaretPosDoc);
 
 		if (IsHangul(preeditStr.at(0))) {
-			MoveImeCarets(- imeCharPos[1]);
+#ifndef Q_OS_WIN
+			if (imeCaretPos > 0) {
+				int oneCharBefore = sqt->pdoc->GetRelativePosition(sqt->CurrentPosition(), -1);
+				MoveImeCarets(- sqt->CurrentPosition() + oneCharBefore);
+			}
+#endif
 			sqt->view.imeCaretBlockOverride = true;
 		}
 
