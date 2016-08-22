@@ -2799,7 +2799,9 @@ val SCLEX_BIBTEX=116
 val SCLEX_SREC=117
 val SCLEX_IHEX=118
 val SCLEX_TEHEX=119
-val SCLEX_STATA=120
+val SCLEX_JSON=120
+val SCLEX_STATA=200
+val SCLEX_SAS=201
 
 # When a lexer specifies its language as SCLEX_AUTOMATIC it receives a
 # value assigned in sequence from SCLEX_AUTOMATIC+1.
@@ -4678,6 +4680,22 @@ val SCE_HEX_GARBAGE=18
 lex IHex=SCLEX_IHEX SCE_HEX_
 # Lexical state for SCLEX_TEHEX (shared with Srec)
 lex TEHex=SCLEX_TEHEX SCE_HEX_
+# Lexical states for SCLEX_JSON
+lex JSON=SCLEX_JSON SCE_JSON_
+val SCE_JSON_DEFAULT=0
+val SCE_JSON_NUMBER=1
+val SCE_JSON_STRING=2
+val SCE_JSON_STRINGEOL=3
+val SCE_JSON_PROPERTYNAME=4
+val SCE_JSON_ESCAPESEQUENCE=5
+val SCE_JSON_LINECOMMENT=6
+val SCE_JSON_BLOCKCOMMENT=7
+val SCE_JSON_OPERATOR=8
+val SCE_JSON_URI=9
+val SCE_JSON_COMPACTIRI=10
+val SCE_JSON_KEYWORD=11
+val SCE_JSON_LDKEYWORD=12
+val SCE_JSON_ERROR=13
 # Lexical states for SCLEX_STATA
 lex STATA=SCLEX_STATA SCE_STATA_
 val SCE_STATA_DEFAULT=0
@@ -4692,6 +4710,24 @@ val SCE_STATA_TYPE=8
 val SCE_STATA_WORD=9
 val SCE_STATA_GLOBAL_MACRO=10
 val SCE_STATA_MACRO=11
+# Lexical states for SCLEX_SAS
+lex SAS=SCLEX_SAS SCE_SAS_
+val SCE_SAS_DEFAULT=0
+val SCE_SAS_COMMENT=1
+val SCE_SAS_COMMENTLINE=2
+val SCE_SAS_COMMENTBLOCK=3
+val SCE_SAS_NUMBER=4
+val SCE_SAS_OPERATOR=5
+val SCE_SAS_IDENTIFIER=6
+val SCE_SAS_STRING=7
+val SCE_SAS_TYPE=8
+val SCE_SAS_WORD=9
+val SCE_SAS_GLOBAL_MACRO=10
+val SCE_SAS_MACRO=11
+val SCE_SAS_MACRO_KEYWORD=12
+val SCE_SAS_BLOCK_KEYWORD=13
+val SCE_SAS_MACRO_FUNCTION=14
+val SCE_SAS_STATEMENT=15
 
 # Events
 
@@ -4727,7 +4763,7 @@ evt void FocusIn=2028(void)
 evt void FocusOut=2029(void)
 evt void AutoCCompleted=2030(string text, int position, int ch, CompletionMethods listCompletionMethod)
 
-# There are no provisional features currently
+# There are no provisional APIs currently, but some arguments to SCI_SETTECHNOLOGY are provisional.
 
 cat Provisional
 

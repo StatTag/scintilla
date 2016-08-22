@@ -126,6 +126,7 @@ int Scintilla_LinkLexers() {
 	LINK_LEXER(lmHTML);
 	LINK_LEXER(lmIHex);
 	LINK_LEXER(lmInno);
+	LINK_LEXER(lmJSON);
 	LINK_LEXER(lmKix);
 	LINK_LEXER(lmKVIrc);
 	LINK_LEXER(lmLatex);
@@ -169,6 +170,7 @@ int Scintilla_LinkLexers() {
 	LINK_LEXER(lmRegistry);
 	LINK_LEXER(lmRuby);
 	LINK_LEXER(lmRust);
+	LINK_LEXER(lmSAS);
 	LINK_LEXER(lmScriptol);
 	LINK_LEXER(lmSmalltalk);
 	LINK_LEXER(lmSML);

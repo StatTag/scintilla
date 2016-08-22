@@ -149,6 +149,7 @@ LEXOBJS=\
 	$(DIR_O)\LexHex.obj \
 	$(DIR_O)\LexHTML.obj \
 	$(DIR_O)\LexInno.obj \
+	$(DIR_O)\LexJSON.obj \
 	$(DIR_O)\LexKix.obj \
 	$(DIR_O)\LexKVIrc.obj \
 	$(DIR_O)\LexLaTeX.obj \
@@ -187,6 +188,7 @@ LEXOBJS=\
 	$(DIR_O)\LexRegistry.obj \
 	$(DIR_O)\LexRuby.obj \
 	$(DIR_O)\LexRust.obj \
+	$(DIR_O)\LexSAS.obj \
 	$(DIR_O)\LexScriptol.obj \
 	$(DIR_O)\LexSmalltalk.obj \
 	$(DIR_O)\LexSML.obj \
@@ -229,10 +231,10 @@ $(DIR_O)\ScintRes.res : ScintRes.rc
 	$(RC) -fo$@ $**
 
 $(COMPONENT): $(SOBJS) $(DIR_O)\ScintRes.res
-	$(LD) $(LDFLAGS) -DLL -OUT:$@ $** $(LIBS)
+	$(LD) $(LDFLAGS) -DEF:Scintilla.def -DLL -OUT:$@ $** $(LIBS)
 
 $(LEXCOMPONENT): $(LOBJS) $(DIR_O)\ScintRes.res
-	$(LD) $(LDFLAGS) -DLL -OUT:$@ $** $(LIBS)
+	$(LD) $(LDFLAGS) -DEF:Scintilla.def -DLL -OUT:$@ $** $(LIBS)
 
 $(LEXLIB): $(LEXOBJS)
 	LIB /OUT:$@ $(LEXOBJS)
@@ -582,6 +584,8 @@ $(DIR_O)\LexHTML.obj: ..\lexers\LexHTML.cxx $(LEX_HEADERS)
 
 $(DIR_O)\LexInno.obj: ..\lexers\LexInno.cxx $(LEX_HEADERS)
 
+$(DIR_O)\LexJSON.obj: ..\lexers\LexJSON.cxx $(LEX_HEADERS)
+
 $(DIR_O)\LexKix.obj: ..\lexers\LexKix.cxx $(LEX_HEADERS)
 
 $(DIR_O)\LexKVIrc.obj: ..\lexers\LexKVIrc.cxx $(LEX_HEADERS)
@@ -657,6 +661,8 @@ $(DIR_O)\LexRegistry.obj: ..\lexers\LexRegistry.cxx $(LEX_HEADERS)
 $(DIR_O)\LexRuby.obj: ..\lexers\LexRuby.cxx $(LEX_HEADERS)
 
 $(DIR_O)\LexRust.obj: ..\lexers\LexRust.cxx $(LEX_HEADERS)
+
+$(DIR_O)\LexSAS.obj: ..\lexers\LexSAS.cxx $(LEX_HEADERS)
 
 $(DIR_O)\LexScriptol.obj: ..\lexers\LexScriptol.cxx $(LEX_HEADERS)
 
