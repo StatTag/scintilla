@@ -1410,7 +1410,7 @@ static void DrawTranslucentLineState(Surface *surface, const EditModel &model, c
 	int marksDrawnInText = marksOfLine & vsDraw.maskDrawInText;
 	for (int markBit = 0; (markBit < 32) && marksDrawnInText; markBit++) {
 		if (marksDrawnInText & 1) {
-			if (vsDraw.markers[markBit].markType == SC_MARK_BACKGROUND) {
+			if (vsDraw.markers[markBit].markType == SC_MARK_BACKGROUND || vsDraw.markers[markBit].markType == SC_MARK_EXT_BACKGROUND) {
 				SimpleAlphaRectangle(surface, rcLine, vsDraw.markers[markBit].back, vsDraw.markers[markBit].alpha);
 			} else if (vsDraw.markers[markBit].markType == SC_MARK_UNDERLINE) {
 				PRectangle rcUnderline = rcLine;
