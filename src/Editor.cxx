@@ -2460,6 +2460,17 @@ bool Editor::NotifyMarginClick(Point pt, bool shift, bool ctrl, bool alt) {
 	return NotifyMarginClick(pt, ModifierFlags(shift, ctrl, alt));
 }
 
+bool Editor::NotifyLineNumberClicked(Point pt, int modifiers) {
+	int position = pdoc->LineStart(LineFromLocation(pt));
+	SCNotification scn = {};
+	scn.nmhdr.code = SCN_LINESELECTCLICK;
+	scn.modifiers = modifiers;
+	scn.position = position;
+	scn.margin = 0;
+	NotifyParent(scn);
+	return true;
+}
+
 void Editor::NotifyNeedShown(int pos, int len) {
 	SCNotification scn = {};
 	scn.nmhdr.code = SCN_NEEDSHOWN;
@@ -4474,7 +4485,10 @@ void Editor::ButtonDownWithModifiers(Point pt, unsigned int curTime, int modifie
 			WordSelection(wordSelectInitialCaretPos);
 		} else if (selectionType == selSubLine || selectionType == selWholeLine) {
 			lineAnchorPos = newPos.Position();
-			LineSelection(lineAnchorPos, lineAnchorPos, selectionType == selWholeLine);
+			if (!(marginOptions & SC_MARGINOPTION_NOSELECT)) {
+				LineSelection(lineAnchorPos, lineAnchorPos, selectionType == selWholeLine);
+			}
+			NotifyLineNumberClicked(pt, modifiers);
 			//Platform::DebugPrintf("Triple click: %d - %d\n", anchor, currentPos);
 		} else {
 			SetEmptySelection(sel.MainCaret());
@@ -4492,7 +4506,10 @@ void Editor::ButtonDownWithModifiers(Point pt, unsigned int curTime, int modifie
 				// Single click in margin: select whole line or only subline if word wrap is enabled
 				lineAnchorPos = newPos.Position();
 				selectionType = (Wrapping() && (marginOptions & SC_MARGINOPTION_SUBLINESELECT)) ? selSubLine : selWholeLine;
-				LineSelection(lineAnchorPos, lineAnchorPos, selectionType == selWholeLine);
+				if (!(marginOptions & SC_MARGINOPTION_NOSELECT)) {
+					LineSelection(lineAnchorPos, lineAnchorPos, selectionType == selWholeLine);
+				}
+				NotifyLineNumberClicked(pt, modifiers);
 			} else {
 				// Single shift+click in margin: select from line anchor to clicked line
 				if (sel.MainAnchor() > sel.MainCaret())
@@ -4505,7 +4522,10 @@ void Editor::ButtonDownWithModifiers(Point pt, unsigned int curTime, int modifie
 				// This ensures that we continue selecting in the same selection mode.
 				if (sel.Empty() || (selectionType != selSubLine && selectionType != selWholeLine))
 					selectionType = (Wrapping() && (marginOptions & SC_MARGINOPTION_SUBLINESELECT)) ? selSubLine : selWholeLine;
-				LineSelection(newPos.Position(), lineAnchorPos, selectionType == selWholeLine);
+				if (!(marginOptions & SC_MARGINOPTION_NOSELECT)) {
+					LineSelection(newPos.Position(), lineAnchorPos, selectionType == selWholeLine);
+				}
+				NotifyLineNumberClicked(pt, modifiers);
 			}
 
 			SetDragPosition(SelectionPosition(invalidPosition));
@@ -4711,7 +4731,9 @@ void Editor::ButtonMoveWithModifiers(Point pt, int modifiers) {
 				}
 			} else {
 				// Continue selecting by line
-				LineSelection(movePos.Position(), lineAnchorPos, selectionType == selWholeLine);
+				if (!(marginOptions & SC_MARGINOPTION_NOSELECT)) {
+					LineSelection(movePos.Position(), lineAnchorPos, selectionType == selWholeLine);
+				}
 			}
 		}
 

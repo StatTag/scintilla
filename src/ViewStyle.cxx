@@ -209,6 +209,7 @@ void ViewStyle::CalculateMarginWidthAndMask() {
 		case SC_MARK_EMPTY:
 			maskInLine &= ~maskBit;
 			break;
+		case SC_MARK_EXT_BACKGROUND:
 		case SC_MARK_BACKGROUND:
 		case SC_MARK_UNDERLINE:
 			maskInLine &= ~maskBit;
@@ -481,7 +482,7 @@ ColourOptional ViewStyle::Background(int marksOfLine, bool caretActive, bool lin
 	if (!background.isSet && marksOfLine) {
 		int marks = marksOfLine;
 		for (int markBit = 0; (markBit < 32) && marks; markBit++) {
-			if ((marks & 1) && (markers[markBit].markType == SC_MARK_BACKGROUND) &&
+			if ((marks & 1) && (markers[markBit].markType == SC_MARK_BACKGROUND || markers[markBit].markType == SC_MARK_EXT_BACKGROUND) &&
 				(markers[markBit].alpha == SC_ALPHA_NOALPHA)) {
 				background = ColourOptional(markers[markBit].back, true);
 			}
