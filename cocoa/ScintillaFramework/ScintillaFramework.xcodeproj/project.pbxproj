@@ -125,7 +125,7 @@
 		114B6F9D11FA75BE004FB6AB /* PropSetSimple.cxx in Sources */ = {isa = PBXBuildFile; fileRef = 114B6F9411FA75BE004FB6AB /* PropSetSimple.cxx */; };
 		114B6F9E11FA75BE004FB6AB /* StyleContext.cxx in Sources */ = {isa = PBXBuildFile; fileRef = 114B6F9511FA75BE004FB6AB /* StyleContext.cxx */; };
 		114B6F9F11FA75BE004FB6AB /* WordList.cxx in Sources */ = {isa = PBXBuildFile; fileRef = 114B6F9611FA75BE004FB6AB /* WordList.cxx */; };
-		114B6FA111FA75DB004FB6AB /* ILexer.h in Headers */ = {isa = PBXBuildFile; fileRef = 114B6FA011FA75DB004FB6AB /* ILexer.h */; };
+		114B6FA111FA75DB004FB6AB /* ILexer.h in Headers */ = {isa = PBXBuildFile; fileRef = 114B6FA011FA75DB004FB6AB /* ILexer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		114B6FBD11FA7623004FB6AB /* AutoComplete.h in Headers */ = {isa = PBXBuildFile; fileRef = 114B6FA211FA7623004FB6AB /* AutoComplete.h */; };
 		114B6FBE11FA7623004FB6AB /* CallTip.h in Headers */ = {isa = PBXBuildFile; fileRef = 114B6FA311FA7623004FB6AB /* CallTip.h */; };
 		114B6FBF11FA7623004FB6AB /* Catalogue.h in Headers */ = {isa = PBXBuildFile; fileRef = 114B6FA411FA7623004FB6AB /* Catalogue.h */; };
@@ -219,9 +219,9 @@
 		28D516D91830FFCA0047C93D /* mac_cursor_busy@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 28D516D61830FFCA0047C93D /* mac_cursor_busy@2x.png */; };
 		28D516DA1830FFCA0047C93D /* mac_cursor_flipped@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 28D516D71830FFCA0047C93D /* mac_cursor_flipped@2x.png */; };
 		28FDA42119B6967B00BE27D7 /* LexBibTeX.cxx in Sources */ = {isa = PBXBuildFile; fileRef = 28FDA42019B6967B00BE27D7 /* LexBibTeX.cxx */; };
+		8DC2EF530486A6940098B216 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C1666FE841158C02AAC07 /* InfoPlist.strings */; };
 		382443A61DBE9CB100EF0048 /* LexSAS.cxx in Sources */ = {isa = PBXBuildFile; fileRef = 382443A41DBE9CB100EF0048 /* LexSAS.cxx */; };
 		382443A71DBE9CB100EF0048 /* LexStata.cxx in Sources */ = {isa = PBXBuildFile; fileRef = 382443A51DBE9CB100EF0048 /* LexStata.cxx */; };
-		8DC2EF530486A6940098B216 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C1666FE841158C02AAC07 /* InfoPlist.strings */; };
 		8DC2EF570486A6940098B216 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */; };
 /* End PBXBuildFile section */
 
@@ -813,6 +813,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				28BC38EC1B74C6AD008BF9EB /* Sci_Position.h in Headers */,
+				114B6FA111FA75DB004FB6AB /* ILexer.h in Headers */,
 				2744E5A40FC168A100E85C33 /* InfoBar.h in Headers */,
 				2744E5AC0FC168B200E85C33 /* InfoBarCommunicator.h in Headers */,
 				2744E5AA0FC168A100E85C33 /* ScintillaView.h in Headers */,
@@ -824,7 +825,6 @@
 				2791F3E00FC1A390009DBCF9 /* ScintillaCocoa.h in Headers */,
 				2791F3C70FC19F71009DBCF9 /* Platform.h in Headers */,
 				2791F3C90FC19F71009DBCF9 /* Scintilla.h in Headers */,
-				114B6FA111FA75DB004FB6AB /* ILexer.h in Headers */,
 				114B6FBD11FA7623004FB6AB /* AutoComplete.h in Headers */,
 				114B6FBE11FA7623004FB6AB /* CallTip.h in Headers */,
 				114B6FBF11FA7623004FB6AB /* Catalogue.h in Headers */,
@@ -903,7 +903,7 @@
 		0867D690FE84028FC02AAC07 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0700;
+				LastUpgradeCheck = 0800;
 			};
 			buildConfigurationList = 1DEB91B108733DA50010E9CD /* Build configuration list for PBXProject "ScintillaFramework" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -1023,9 +1023,7 @@
 				114B6F4911FA7526004FB6AB /* LexRebol.cxx in Sources */,
 				114B6F4A11FA7526004FB6AB /* LexRuby.cxx in Sources */,
 				114B6F4B11FA7526004FB6AB /* LexScriptol.cxx in Sources */,
-				382443A71DBE9CB100EF0048 /* LexStata.cxx in Sources */,
 				114B6F4C11FA7526004FB6AB /* LexSmalltalk.cxx in Sources */,
-				382443A61DBE9CB100EF0048 /* LexSAS.cxx in Sources */,
 				114B6F4D11FA7526004FB6AB /* LexSML.cxx in Sources */,
 				114B6F4E11FA7526004FB6AB /* LexSorcus.cxx in Sources */,
 				114B6F4F11FA7526004FB6AB /* LexSpecman.cxx in Sources */,
@@ -1179,11 +1177,27 @@
 		1DEB91B208733DA50010E9CD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
 					../../include,
@@ -1199,9 +1213,25 @@
 		1DEB91B308733DA50010E9CD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
 					../../include,
