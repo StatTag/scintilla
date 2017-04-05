@@ -16,6 +16,7 @@
 #include <vector>
 #include <map>
 #include <algorithm>
+#include <memory>
 
 #include "Platform.h"
 
@@ -64,7 +65,7 @@ using namespace Scintilla;
 #endif
 
 ScintillaBase::ScintillaBase() {
-	displayPopupMenu = true;
+	displayPopupMenu = SC_POPUP_ALL;
 	listType = 0;
 	maxListWidth = 0;
 	multiAutoCMode = SC_MULTIAUTOC_ONCE;
@@ -202,7 +203,7 @@ int ScintillaBase::KeyCommand(unsigned int iMessage) {
 }
 
 void ScintillaBase::AutoCompleteDoubleClick(void *p) {
-	ScintillaBase *sci = reinterpret_cast<ScintillaBase *>(p);
+	ScintillaBase *sci = static_cast<ScintillaBase *>(p);
 	sci->AutoCompleteCompleted(0, SC_AC_DOUBLECLICK);
 }
 
@@ -478,6 +479,11 @@ void ScintillaBase::CallTipClick() {
 	NotifyParent(scn);
 }
 
+bool ScintillaBase::ShouldDisplayPopup(Point ptInWindowCoordinates) const {
+	return (displayPopupMenu == SC_POPUP_ALL ||
+		(displayPopupMenu == SC_POPUP_TEXT && !PointInSelMargin(ptInWindowCoordinates)));
+}
+
 void ScintillaBase::ContextMenu(Point pt) {
 	if (displayPopupMenu) {
 		bool writable = !WndProc(SCI_GETREADONLY, 0, 0);
@@ -510,6 +516,11 @@ void ScintillaBase::ButtonDown(Point pt, unsigned int curTime, bool shift, bool 
 	ButtonDownWithModifiers(pt, curTime, ModifierFlags(shift, ctrl, alt));
 }
 
+void ScintillaBase::RightButtonDownWithModifiers(Point pt, unsigned int curTime, int modifiers) {
+	CancelModes();
+	Editor::RightButtonDownWithModifiers(pt, curTime, modifiers);
+}
+
 #ifdef SCI_LEXER
 
 #ifdef SCI_NAMESPACE
@@ -525,7 +536,7 @@ public:
 	int lexLanguage;
 
 	explicit LexState(Document *pdoc_);
-	virtual ~LexState();
+	~LexState() override;
 	void SetLexer(uptr_t wParam);
 	void SetLexerLanguage(const char *languageName);
 	const char *DescribeWordListSets();
@@ -970,7 +981,7 @@ sptr_t ScintillaBase::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lPara
 		break;
 
 	case SCI_USEPOPUP:
-		displayPopupMenu = wParam != 0;
+		displayPopupMenu = static_cast<int>(wParam);
 		break;
 
 #ifdef SCI_LEXER

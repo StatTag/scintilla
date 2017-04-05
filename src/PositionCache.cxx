@@ -15,6 +15,7 @@
 #include <vector>
 #include <map>
 #include <algorithm>
+#include <memory>
 
 #include "Platform.h"
 
@@ -217,7 +218,7 @@ int LineLayout::FindPositionFromX(XYPOSITION x, Range range, bool charPosition) 
 	return range.end;
 }
 
-Point LineLayout::PointFromPosition(int posInLine, int lineHeight) const {
+Point LineLayout::PointFromPosition(int posInLine, int lineHeight, PointEnd pe) const {
 	Point pt;
 	// In case of very long line put x at arbitrary large position
 	if (posInLine > maxLineLength) {
@@ -230,6 +231,12 @@ Point LineLayout::PointFromPosition(int posInLine, int lineHeight) const {
 			pt.y = static_cast<XYPOSITION>(subLine*lineHeight);
 			if (posInLine <= rangeSubLine.end) {
 				pt.x = positions[posInLine] - positions[rangeSubLine.start];
+				if (rangeSubLine.start != 0)	// Wrapped lines may be indented
+					pt.x += wrapIndent;
+				if (pe & peSubLineEnd)	// Return end of first subline not start of next
+					break;
+			} else if ((pe & peLineEnd) && (subLine == (lines-1))) {
+				pt.x = positions[numCharsInLine] - positions[rangeSubLine.start];
 				if (rangeSubLine.start != 0)	// Wrapped lines may be indented
 					pt.x += wrapIndent;
 			}
@@ -385,7 +392,7 @@ static inline int KeyFromString(const char *charBytes, size_t len) {
 }
 
 SpecialRepresentations::SpecialRepresentations() {
-	std::fill(startByteHasReprs, startByteHasReprs+0x100, 0);
+	std::fill(startByteHasReprs, startByteHasReprs+0x100, static_cast<short>(0));
 }
 
 void SpecialRepresentations::SetRepresentation(const char *charBytes, const char *value) {
@@ -426,7 +433,7 @@ bool SpecialRepresentations::Contains(const char *charBytes, size_t len) const {
 
 void SpecialRepresentations::Clear() {
 	mapReprs.clear();
-	std::fill(startByteHasReprs, startByteHasReprs+0x100, 0);
+	std::fill(startByteHasReprs, startByteHasReprs+0x100, static_cast<short>(0));
 }
 
 void BreakFinder::Insert(int val) {
