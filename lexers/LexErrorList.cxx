@@ -106,7 +106,8 @@ static int RecogniseErrorListLine(const char *lineBuffer, Sci_PositionU lengthLi
 		// perl error message:
 		// <message> at <file> line <line>
 		return SCE_ERR_PERL;
-	} else if ((memcmp(lineBuffer, "   at ", 6) == 0) &&
+	} else if ((lengthLine >= 6) && 
+	           (memcmp(lineBuffer, "   at ", 6) == 0) &&
 	           strstr(lineBuffer, ":line ")) {
 		// A .NET traceback
 		return SCE_ERR_NET;
@@ -257,6 +258,10 @@ static int RecogniseErrorListLine(const char *lineBuffer, Sci_PositionU lengthLi
 			return SCE_ERR_MS;
 		} else if ((state == stCtagsStringDollar) || (state == stCtags)) {
 			return SCE_ERR_CTAG;
+		} else if (initialColonPart && strstr(lineBuffer, ": warning C")) {
+			// Microsoft warning without line number
+			// <filename>: warning C9999
+			return SCE_ERR_MS;
 		} else {
 			return SCE_ERR_DEFAULT;
 		}
@@ -316,12 +321,12 @@ static void ColouriseErrorListLine(
 		int portionStyle = style;
 		while (const char *startSeq = strstr(linePortion, CSI)) {
 			if (startSeq > linePortion) {
-				styler.ColourTo(startPortion + (startSeq - linePortion), portionStyle);
+				styler.ColourTo(startPortion + static_cast<int>(startSeq - linePortion), portionStyle);
 			}
 			const char *endSeq = startSeq + 2;
 			while (!SequenceEnd(*endSeq))
 				endSeq++;
-			const int endSeqPosition = startPortion + (endSeq - linePortion) + 1;
+			const int endSeqPosition = startPortion + static_cast<int>(endSeq - linePortion) + 1;
 			switch (*endSeq) {
 			case 0:
 				styler.ColourTo(endPos, SCE_ERR_ESCSEQ_UNKNOWN);

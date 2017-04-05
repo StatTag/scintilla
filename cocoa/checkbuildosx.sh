@@ -20,7 +20,7 @@ cd ../../..
 # which can cause double build
 
 echo Building Cocoa-native ScintillaFramework and ScintillaTest
-for sdk in macosx10.9 macosx10.8 macosx10.7 macosx10.6 macosx10.5
+for sdk in macosx10.12 macosx10.11 macosx10.10 #macosx10.9 #macosx10.8 macosx10.7 macosx10.6 macosx10.5
 do
     xcodebuild -showsdks | grep $sdk
     if [ "$(xcodebuild -showsdks | grep $sdk)" != "" ]

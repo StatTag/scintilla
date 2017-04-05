@@ -127,12 +127,7 @@ static void ColouriseSASDoc(Sci_PositionU startPos, Sci_Position length, int ini
                 }
                 break;
             case SCE_SAS_STRING:
-                if (sc.ch == '\\') {
-                    if (sc.chNext == '\"' || sc.chNext == '\'' || sc.chNext == '\\') {
-                        sc.Forward();
-                    }
-                }
-                else if (sc.ch == '\"') {
+                if (sc.ch == '\"') {
                     sc.ForwardSetState(SCE_SAS_DEFAULT);
                 }
                 break;
