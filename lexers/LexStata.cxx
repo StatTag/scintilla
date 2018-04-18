@@ -104,7 +104,10 @@ static void ColouriseStataDoc(Sci_PositionU startPos, Sci_Position length, int i
                 break;
             case SCE_STATA_STRING:
                 if (sc.ch == '\\') {
-                    if (sc.chNext == '\"' || sc.chNext == '\'' || sc.chNext == '\\') {
+					// Per Stata documentation, the following characters are the only ones that can be
+					// escaped (not our typical set of quotes, etc.):
+					// https://www.stata.com/support/faqs/programming/backslashes-and-macros/
+                    if (sc.chNext == '$' || sc.chNext == '`' || sc.chNext == '\\') {
                         sc.Forward();
                     }
                 }
