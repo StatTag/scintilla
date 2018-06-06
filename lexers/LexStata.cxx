@@ -2,8 +2,12 @@
 /** @file LexStata.cxx
  ** Lexer for Stata
  **/
-// Copyright 2010 by Alessio Caiazza <alessio.caiazza@ars.toscana.it>
-// The License.txt file describes the conditions under which this software may be distributed.
+// Author: Luke Rasmussen (luke.rasmussen@gmail.com)
+//
+// Developed as part of the StatTag project at Northwestern University Feinberg
+// School of Medicine with funding from Northwestern University Clinical and
+// Translational Sciences Institute through CTSA grant UL1TR001422.  This work
+// has not been reviewed or endorsed by NCATS or the NIH.
 
 #include <stdlib.h>
 #include <string.h>
