@@ -4,6 +4,9 @@
  **/
 // Author: Luke Rasmussen (luke.rasmussen@gmail.com)
 //
+// The License.txt file describes the conditions under which this software may
+// be distributed.
+//
 // Developed as part of the StatTag project at Northwestern University Feinberg
 // School of Medicine with funding from Northwestern University Clinical and
 // Translational Sciences Institute through CTSA grant UL1TR001422.  This work
@@ -27,31 +30,7 @@
 #include "CharacterSet.h"
 #include "LexerModule.h"
 
-#ifdef SCI_NAMESPACE
 using namespace Scintilla;
-#endif
-
-static inline bool IsAWordChar(const int ch) {
-    return (ch < 0x80) && (isalnum(ch) || ch == '.' || ch == '_');
-}
-
-static inline bool IsAWordStart(const int ch) {
-    return (ch < 0x80) && (isalnum(ch) || ch == '_');
-}
-
-static inline bool IsAnOperator(const int ch) {
-    if (IsASCII(ch) && isalnum(ch))
-        return false;
-    // '.' left out as it is used to make up numbers
-    if (ch == '-' || ch == '+' || ch == '!' || ch == '~' ||
-        ch == '?' || ch == ':' || ch == '*' || ch == '/' ||
-        ch == '^' || ch == '<' || ch == '>' || ch == '=' ||
-        ch == '&' || ch == '|' || ch == '$' || ch == '(' ||
-        ch == ')' || ch == '}' || ch == '{' || ch == '[' ||
-        ch == ']')
-        return true;
-    return false;
-}
 
 static void ColouriseStataDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordlists[],
     Accessor &styler) {
@@ -64,11 +43,11 @@ static void ColouriseStataDoc(Sci_PositionU startPos, Sci_Position length, int i
     CharacterSet setWord(CharacterSet::setAlphaNum, "._", 0x80, true);
 
     StyleContext sc(startPos, length, initStyle, styler);
-	bool lineHasNonCommentChar = false;
+    bool lineHasNonCommentChar = false;
     for (; sc.More(); sc.Forward()) {
-		if (sc.atLineStart) {
-			lineHasNonCommentChar = false;
-		}
+        if (sc.atLineStart) {
+          lineHasNonCommentChar = false;
+        }
 
         // Determine if the current state should terminate.
         switch (sc.state) {
@@ -100,7 +79,7 @@ static void ColouriseStataDoc(Sci_PositionU startPos, Sci_Position length, int i
                     sc.ForwardSetState(SCE_STATA_DEFAULT);
                 }
                 break;
-			case SCE_STATA_COMMENT:
+            case SCE_STATA_COMMENT:
             case SCE_STATA_COMMENTLINE:
                 if (sc.atLineStart) {
                     sc.SetState(SCE_STATA_DEFAULT);
@@ -108,9 +87,9 @@ static void ColouriseStataDoc(Sci_PositionU startPos, Sci_Position length, int i
                 break;
             case SCE_STATA_STRING:
                 if (sc.ch == '\\') {
-					// Per Stata documentation, the following characters are the only ones that can be
-					// escaped (not our typical set of quotes, etc.):
-					// https://www.stata.com/support/faqs/programming/backslashes-and-macros/
+                    // Per Stata documentation, the following characters are the only ones that can
+                    // be escaped (not our typical set of quotes, etc.):
+                    // https://www.stata.com/support/faqs/programming/backslashes-and-macros/
                     if (sc.chNext == '$' || sc.chNext == '`' || sc.chNext == '\\') {
                         sc.Forward();
                     }
@@ -120,20 +99,20 @@ static void ColouriseStataDoc(Sci_PositionU startPos, Sci_Position length, int i
                 }
                 break;
         }
-        
+
         // Determine if a new state should be entered.
         if (sc.state == SCE_STATA_DEFAULT) {
             if (IsADigit(sc.ch) || (sc.ch == '.' && IsADigit(sc.chNext))) {
-				lineHasNonCommentChar = true;
+                lineHasNonCommentChar = true;
                 sc.SetState(SCE_STATA_NUMBER);
             }
             else if (setWordStart.Contains(sc.ch)) {
-				lineHasNonCommentChar = true;
+                lineHasNonCommentChar = true;
                 sc.SetState(SCE_STATA_IDENTIFIER);
             }
-			else if (sc.Match('*') && !lineHasNonCommentChar) {
-				sc.SetState(SCE_STATA_COMMENT);
-			}
+            else if (sc.Match('*') && !lineHasNonCommentChar) {
+                sc.SetState(SCE_STATA_COMMENT);
+            }
             else if (sc.Match('/', '*')) {
                 sc.SetState(SCE_STATA_COMMENTBLOCK);
                 sc.Forward();	// Eat the * so it isn't used for the end of the comment
@@ -142,17 +121,17 @@ static void ColouriseStataDoc(Sci_PositionU startPos, Sci_Position length, int i
                 sc.SetState(SCE_STATA_COMMENTLINE);
             }
             else if (sc.ch == '\"') {
-				lineHasNonCommentChar = true;
+                lineHasNonCommentChar = true;
                 sc.SetState(SCE_STATA_STRING);
             }
-            else if (isoperator(static_cast<char>(sc.ch))) {
-				lineHasNonCommentChar = true;
+            else if (isoperator(sc.ch)) {
+                lineHasNonCommentChar = true;
                 sc.SetState(SCE_STATA_OPERATOR);
             }
         }
     }
 
-	sc.Complete();
+    sc.Complete();
 }
 
 // Store both the current line's fold level and the next lines in the
