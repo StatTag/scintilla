@@ -1,12 +1,12 @@
 # Build all the unit tests with Microsoft Visual C++ using nmake
-# Tested with Visual C++ 2010 and 2013
+# Tested with Visual C++ 2019
 
 DEL = del /q
 EXE = unitTest.exe
 
 INCLUDEDIRS = /I../../include /I../../src /I../../lexlib
 
-CXXFLAGS = /EHsc /wd 4805 $(INCLUDEDIRS)
+CXXFLAGS = /EHsc /std:c++17 /D_HAS_AUTO_PTR_ETC=1 /wd 4805 $(INCLUDEDIRS)
 
 # Files in this directory containing tests
 TESTSRC=test*.cxx
@@ -17,7 +17,10 @@ TESTEDSRC=\
  ../../src/CharClassify.cxx \
  ../../src/ContractionState.cxx \
  ../../src/Decoration.cxx \
- ../../src/RunStyles.cxx 
+ ../../src/PerLine.cxx \
+ ../../src/RunStyles.cxx \
+ ../../src/UniConversion.cxx \
+ ../../src/UniqueString.cxx
 
 TESTS=$(EXE)
 

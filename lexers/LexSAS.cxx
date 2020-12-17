@@ -4,6 +4,9 @@
  **/
 // Author: Luke Rasmussen (luke.rasmussen@gmail.com)
 //
+// The License.txt file describes the conditions under which this software may
+// be distributed.
+//
 // Developed as part of the StatTag project at Northwestern University Feinberg
 // School of Medicine with funding from Northwestern University Clinical and
 // Translational Sciences Institute through CTSA grant UL1TR001422.  This work
@@ -27,42 +30,18 @@
 #include "CharacterSet.h"
 #include "LexerModule.h"
 
-#ifdef SCI_NAMESPACE
 using namespace Scintilla;
-#endif
-
-static inline bool IsAWordChar(const int ch) {
-    return (ch < 0x80) && (isalnum(ch) || ch == '.' || ch == '_');
-}
-
-static inline bool IsAWordStart(const int ch) {
-    return (ch < 0x80) && (isalnum(ch) || ch == '_');
-}
-
-static inline bool IsAnOperator(const int ch) {
-    if (IsASCII(ch) && isalnum(ch))
-        return false;
-    // '.' left out as it is used to make up numbers
-    if (ch == '-' || ch == '+' || ch == '!' || ch == '~' ||
-        ch == '?' || ch == ':' || ch == '*' || ch == '/' ||
-        ch == '^' || ch == '<' || ch == '>' || ch == '=' ||
-        ch == '&' || ch == '|' || ch == '$' || ch == '(' ||
-        ch == ')' || ch == '}' || ch == '{' || ch == '[' ||
-        ch == ']')
-        return true;
-    return false;
-}
 
 static void ColouriseSASDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordlists[],
     Accessor &styler) {
 
     WordList &keywords = *keywordlists[0];
-	WordList &blockKeywords = *keywordlists[1];
+    WordList &blockKeywords = *keywordlists[1];
     WordList &functionKeywords = *keywordlists[2];
-	WordList &statements = *keywordlists[3];
-    
+    WordList &statements = *keywordlists[3];
+
     CharacterSet setCouldBePostOp(CharacterSet::setNone, "+-");
-	CharacterSet setMacroStart(CharacterSet::setNone, "%");
+    CharacterSet setMacroStart(CharacterSet::setNone, "%");
     CharacterSet setWordStart(CharacterSet::setAlpha, "_", 0x80, true);
     CharacterSet setWord(CharacterSet::setAlphaNum, "._", 0x80, true);
 
@@ -84,36 +63,32 @@ static void ColouriseSASDoc(Sci_PositionU startPos, Sci_Position length, int ini
                     sc.SetState(SCE_SAS_DEFAULT);
                 }
                 break;
-			case SCE_SAS_MACRO:
-				if (!setWord.Contains(sc.ch) || (sc.ch == '.')) {
-					char s[1000];
-					sc.GetCurrentLowered(s, sizeof(s));
-					if (keywords.InList(s)) {
-						sc.ChangeState(SCE_SAS_MACRO_KEYWORD);
-					}
-					else if (blockKeywords.InList(s)) {
-						sc.ChangeState(SCE_SAS_BLOCK_KEYWORD);
-					}
-					else if (functionKeywords.InList(s)) {
-						sc.ChangeState(SCE_SAS_MACRO_FUNCTION);
-					}
-					sc.SetState(SCE_SAS_DEFAULT);
-				}
-				break;
+            case SCE_SAS_MACRO:
+              if (!setWord.Contains(sc.ch) || (sc.ch == '.')) {
+                char s[1000];
+                sc.GetCurrentLowered(s, sizeof(s));
+                if (keywords.InList(s)) {
+                  sc.ChangeState(SCE_SAS_MACRO_KEYWORD);
+                }
+                else if (blockKeywords.InList(s)) {
+                  sc.ChangeState(SCE_SAS_BLOCK_KEYWORD);
+                }
+                else if (functionKeywords.InList(s)) {
+                  sc.ChangeState(SCE_SAS_MACRO_FUNCTION);
+                }
+                sc.SetState(SCE_SAS_DEFAULT);
+              }
+              break;
             case SCE_SAS_IDENTIFIER:
                 if (!setWord.Contains(sc.ch) || (sc.ch == '.')) {
                     char s[1000];
-					sc.GetCurrentLowered(s, sizeof(s));
-					if (statements.InList(s)) {
-						sc.ChangeState(SCE_SAS_STATEMENT);
+                    sc.GetCurrentLowered(s, sizeof(s));
+                    if (statements.InList(s)) {
+                      sc.ChangeState(SCE_SAS_STATEMENT);
                     }
-					else if(blockKeywords.InList(s)) {
-						sc.ChangeState(SCE_SAS_BLOCK_KEYWORD);
-					}
-					/*
-                    else if (types.InList(s)) {
-                        sc.ChangeState(SCE_SAS_TYPE);
-                    }*/
+                    else if(blockKeywords.InList(s)) {
+                      sc.ChangeState(SCE_SAS_BLOCK_KEYWORD);
+                    }
                     sc.SetState(SCE_SAS_DEFAULT);
                 }
                 break;
@@ -126,7 +101,7 @@ static void ColouriseSASDoc(Sci_PositionU startPos, Sci_Position length, int ini
             case SCE_SAS_COMMENT:
             case SCE_SAS_COMMENTLINE:
                 if (sc.Match(';')) {
-					sc.Forward();
+                    sc.Forward();
                     sc.SetState(SCE_SAS_DEFAULT);
                 }
                 break;
@@ -136,7 +111,7 @@ static void ColouriseSASDoc(Sci_PositionU startPos, Sci_Position length, int ini
                 }
                 break;
         }
-        
+
         // Determine if a new state should be entered.
         if (sc.state == SCE_SAS_DEFAULT) {
             if (IsADigit(sc.ch) || (sc.ch == '.' && IsADigit(sc.chNext))) {
@@ -160,18 +135,18 @@ static void ColouriseSASDoc(Sci_PositionU startPos, Sci_Position length, int ini
             else if (sc.ch == '\"') {
                 lineHasNonCommentChar = true;
                 sc.SetState(SCE_SAS_STRING);
-			}
-			else if (setMacroStart.Contains(sc.ch)) {
-				lineHasNonCommentChar = true;
-				sc.SetState(SCE_SAS_MACRO);
-			}
+            }
+            else if (setMacroStart.Contains(sc.ch)) {
+              lineHasNonCommentChar = true;
+              sc.SetState(SCE_SAS_MACRO);
+            }
             else if (isoperator(static_cast<char>(sc.ch))) {
                 lineHasNonCommentChar = true;
                 sc.SetState(SCE_SAS_OPERATOR);
             }
         }
     }
-	
+
     sc.Complete();
 }
 
@@ -237,7 +212,7 @@ static void FoldSASDoc(Sci_PositionU startPos, Sci_Position length, int, WordLis
 
 static const char * const SASWordLists[] = {
     "Language Keywords",
-	"Macro Keywords",
+	  "Macro Keywords",
     "Types",
     0,
 };

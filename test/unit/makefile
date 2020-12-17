@@ -3,7 +3,9 @@
 # On Windows g++ is used, on OS X clang, and on Linux G++ is used by default
 # but clang can be used by defining CLANG when invoking make
 # clang works only with libc++, not libstdc++
-# Tested with clang 3.3 and g++ 4.8
+# Tested with clang 9 and g++ 9
+
+CXXSTD=c++17
 
 ifndef windir
 ifeq ($(shell uname),Darwin)
@@ -13,7 +15,7 @@ USELIBCPP = 1
 endif
 endif
 
-CXXFLAGS += --std=c++11
+CXXFLAGS += --std=$(CXXSTD)
 
 ifdef CLANG
 CXX = clang++
@@ -52,7 +54,10 @@ TESTEDSRC=\
  ../../src/CharClassify.cxx \
  ../../src/ContractionState.cxx \
  ../../src/Decoration.cxx \
- ../../src/RunStyles.cxx
+ ../../src/PerLine.cxx \
+ ../../src/RunStyles.cxx \
+ ../../src/UniConversion.cxx \
+ ../../src/UniqueString.cxx
 
 TESTS=$(EXE)
 

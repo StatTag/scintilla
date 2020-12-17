@@ -1,9 +1,13 @@
 // Unit Tests for Scintilla internal data structures
 
-#include <string.h>
+#include <cstddef>
+#include <cstring>
 
 #include <stdexcept>
+#include <string_view>
+#include <vector>
 #include <algorithm>
+#include <memory>
 
 #include "Platform.h"
 
@@ -12,6 +16,8 @@
 #include "Partitioning.h"
 
 #include "catch.hpp"
+
+using namespace Scintilla;
 
 const int growSize = 4;
 
@@ -22,7 +28,7 @@ static const int testArray[lengthTestArray] = {3, 4, 5, 6, 7, 8, 9, 10};
 
 TEST_CASE("SplitVectorWithRangeAdd") {
 
-	SplitVectorWithRangeAdd svwra(growSize);
+	SplitVectorWithRangeAdd<int> svwra(growSize);
 
 	SECTION("IsEmptyInitially") {
 		REQUIRE(0 == svwra.Length());
@@ -45,7 +51,7 @@ TEST_CASE("SplitVectorWithRangeAdd") {
 
 TEST_CASE("Partitioning") {
 
-	Partitioning part(growSize);
+	Partitioning<Sci::Position> part(growSize);
 
 	SECTION("IsEmptyInitially") {
 		REQUIRE(1 == part.Partitions());
@@ -87,6 +93,32 @@ TEST_CASE("Partitioning") {
 		REQUIRE(0 == part.PositionFromPartition(0));
 		REQUIRE(5 == part.PositionFromPartition(1));
 		REQUIRE(8 == part.PositionFromPartition(2));
+	}
+
+	SECTION("InsertMultiple") {
+		part.InsertText(0, 10);
+		const Sci::Position positions[] { 2, 5, 7 };
+		part.InsertPartitions(1, positions, std::size(positions));
+		REQUIRE(4 == part.Partitions());
+		REQUIRE(0 == part.PositionFromPartition(0));
+		REQUIRE(2 == part.PositionFromPartition(1));
+		REQUIRE(5 == part.PositionFromPartition(2));
+		REQUIRE(7 == part.PositionFromPartition(3));
+		REQUIRE(10 == part.PositionFromPartition(4));
+	}
+
+	SECTION("InsertMultipleWithCast") {
+		part.InsertText(0, 9);
+		REQUIRE(1 == part.Partitions());
+		const ptrdiff_t positionsp[]{ 2, 4, 6, 8 };
+		part.InsertPartitionsWithCast(1, positionsp, std::size(positionsp));
+		REQUIRE(5 == part.Partitions());
+		REQUIRE(0 == part.PositionFromPartition(0));
+		REQUIRE(2 == part.PositionFromPartition(1));
+		REQUIRE(4 == part.PositionFromPartition(2));
+		REQUIRE(6 == part.PositionFromPartition(3));
+		REQUIRE(8 == part.PositionFromPartition(4));
+		REQUIRE(9 == part.PositionFromPartition(5));
 	}
 
 	SECTION("InsertReversed") {

@@ -3,10 +3,15 @@ README for building of Scintilla and SciTE
 Scintilla can be built by itself.
 To build SciTE, Scintilla must first be built.
 
+Lexers can be either compiled into Scintilla or built separately into a Lexilla
+shared library.
+A separate Lexilla is the preferred option and will become the only supported
+direction in Scintilla 5.0.
+See lexilla/src/README for information on building Lexilla.
 
 *** GTK+/Linux version ***
 
-You must first have GTK+ 2.18 or later and GCC (4.8 or better) installed.
+You must first have GTK+ 2.24 or later and GCC (7.1 or better) installed.
 Clang may be used by adding CLANG=1 to the make command line.
 Other C++ compilers may work but may require tweaking the make file.
 Either GTK+ 2.x or 3.x may be used with 2.x the default and 3.x
@@ -42,9 +47,12 @@ The current make file only supports static linking between SciTE and Scintilla.
 
 *** Windows version ***
 
-A C++ 11 compiler is required.
-Visual Studio 2015 is the development system used for most development
-although Mingw32 4.8 is also supported.
+A C++ 17 compiler is required.
+Visual Studio 2017 is the development system used for most development
+although Mingw-w64 7.1 is also supported.
+
+There are versions of Scintilla with lexers (SciLexer.DLL) and without lexers
+(Scintilla.DLL). Make builds both versions.
 
 To build Scintilla, make in the scintilla/win32 directory
 		cd scintilla\win32
@@ -61,9 +69,12 @@ An executable SciTE will now be in scite/bin.
 
 *** GTK+/Windows version ***
 
-Mingw32 is known to work. Other compilers will probably not work.
+Mingw-w64 is known to work. Other compilers will probably not work.
 
 Only Scintilla will build with GTK+ on Windows. SciTE will not work.
+
+Make builds both a static library version of Scintilla with lexers (scintilla.a) and
+a shared library without lexers (libscintilla.so or or libscintilla.dll).
 
 To build Scintilla, make in the scintilla/gtk directory
 	cd scintilla\gtk
@@ -71,13 +82,21 @@ To build Scintilla, make in the scintilla/gtk directory
 
 *** macOS Cocoa version ***
 
-Xcode 8 may be used to build Scintilla on macOS.
+Xcode 9.2 or later may be used to build Scintilla on macOS.
 
 There is no open source version of SciTE for macOS but there is a commercial
 version available through the App Store.
 
-To build Scintilla, run xcodebuild in the scintilla/cocoa/ScintillaFramework directory
+There are versions of Scintilla.framework with lexers (ScintillaFramework) and
+without lexers (Scintilla).
+
+To build Scintilla, run xcodebuild in the scintilla/cocoa/ScintillaFramework or 
+scintilla/cocoa/Scintilla directory
+
+        cd cocoa/Scintilla
+		or
         cd cocoa/ScintillaFramework
+
 	xcodebuild
 
 *** Qt version ***
